@@ -226,7 +226,7 @@ function findArb(game,sport){
   });
   var implied=0;var valid=true;
   names.forEach(function(n){if(!best[n]||best[n].odds===0){valid=false;}else{implied+=1/best[n].odds;}});
-  if(!valid||implied>=1)return null;
+  if(!valid||implied>=1)return null; var bkNames=Object.values(best).map(function(b){return b.bookie;}); if(bkNames.every(function(b){return b===bkNames[0];}))return null;
   var margin=Math.round((1-implied)*1000)/10;
   if(margin<0.1)return null;
   var t=new Date(game.commence_time);
