@@ -180,7 +180,7 @@ async function loadAll() {
   for(var i=0;i<SPORTS.length;i++){
     var sp=SPORTS[i];
     try{
-      var url='https://api.the-odds-api.com/v4/sports/'+sp.key+'/odds/?apiKey='+API_KEY+'&regions=au&markets=h2h&oddsFormat=decimal&bookmakers='+AU_BOOKMAKERS;
+      var url='https://api.the-odds-api.com/v4/sports/'+sp.key+'/odds/?apiKey='+API_KEY+'&regions=au&markets=h2h,h2h_lay&oddsFormat=decimal&bookmakers='+AU_BOOKMAKERS;
       var res=await fetch(url);
       if(!res.ok){
         if(res.status===401){
