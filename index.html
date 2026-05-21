@@ -138,7 +138,7 @@ h1{font-size:20px;font-weight:600;color:#fff;margin-bottom:4px;}
 </div>
 
 <script>
-var API_KEY = 'YOUR_ODDS_API_KEY';
+var API_KEY = 'a7d2bf31bedb58714dbefe45fc6c25e5';
 var allArbs = [];
 var allValue = [];
 var arbFilter = 'all';
@@ -184,7 +184,7 @@ async function loadAll() {
       var res=await fetch(url);
       if(!res.ok){
         if(res.status===401){
-          var errHtml='<div class="error-box">Invalid API key — open the file and replace YOUR_ODDS_API_KEY with your key from the-odds-api.com</div>';
+          var errHtml='<div class="error-box">Invalid API key — open the file and replace a7d2bf31bedb58714dbefe45fc6c25e5 with your key from the-odds-api.com</div>';
           document.getElementById('arb-list').innerHTML=errHtml;
           document.getElementById('value-list').innerHTML=errHtml;
           btns.forEach(function(b){b.disabled=false;b.innerHTML='&#8635; Fetch live odds';});
