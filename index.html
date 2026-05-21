@@ -138,7 +138,7 @@ h1{font-size:20px;font-weight:600;color:#fff;margin-bottom:4px;}
 </div>
 
 <script>
-var API_KEY = 'a7d2bf31bedb58714dbefe45fc6c25e5';
+var API_KEY = 'YOUR_ODDS_API_KEY';
 var allArbs = [];
 var allValue = [];
 var arbFilter = 'all';
@@ -184,7 +184,7 @@ async function loadAll() {
       var res=await fetch(url);
       if(!res.ok){
         if(res.status===401){
-          var errHtml='<div class="error-box">Invalid API key — open the file and replace a7d2bf31bedb58714dbefe45fc6c25e5 with your key from the-odds-api.com</div>';
+          var errHtml='<div class="error-box">Invalid API key — open the file and replace YOUR_ODDS_API_KEY with your key from the-odds-api.com</div>';
           document.getElementById('arb-list').innerHTML=errHtml;
           document.getElementById('value-list').innerHTML=errHtml;
           btns.forEach(function(b){b.disabled=false;b.innerHTML='&#8635; Fetch live odds';});
@@ -237,7 +237,7 @@ function findArb(game,sport){
 function findValue(game,sport){
   if(!game.bookmakers||game.bookmakers.length<2)return[];
   var betfair=null;
-  game.bookmakers.forEach(function(bk){if(bk.key==='betfair'||bk.title.toLowerCase().indexOf('betfair')!==-1)betfair=bk;});
+  game.bookmakers.forEach(function(bk){if(bk.key==='betfair_ex_au'||bk.key==='betfair'||bk.title.toLowerCase().indexOf('betfair')!==-1)betfair=bk;});
   if(!betfair||!betfair.markets||!betfair.markets[0])return[];
 
   var bfOdds={};
@@ -245,7 +245,7 @@ function findValue(game,sport){
 
   var results=[];
   game.bookmakers.forEach(function(bk){
-    if(bk.key==='betfair'||bk.title.toLowerCase().indexOf('betfair')!==-1)return;
+    if(bk.key==='betfair_ex_au'||bk.key==='betfair'||bk.title.toLowerCase().indexOf('betfair')!==-1)return;
     if(!bk.markets||!bk.markets[0])return;
     bk.markets[0].outcomes.forEach(function(o){
       if(!bfOdds[o.name]||bfOdds[o.name]===0)return;
