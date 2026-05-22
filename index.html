@@ -3,26 +3,26 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Arb + Value Finder</title>
+<title>Arb + Value + Props Finder</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:'Segoe UI',system-ui,sans-serif;background:#0f1117;color:#e2e8f0;min-height:100vh;padding:20px;}
 h1{font-size:20px;font-weight:600;color:#fff;margin-bottom:4px;}
 .subtitle{font-size:13px;color:#64748b;margin-bottom:20px;}
-.tabs{display:flex;gap:0;border-bottom:1px solid #2d3348;margin-bottom:24px;}
-.tab-btn{background:none;border:none;color:#64748b;font-size:14px;padding:10px 20px;cursor:pointer;font-family:inherit;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all 0.15s;}
+.tabs{display:flex;gap:0;border-bottom:1px solid #2d3348;margin-bottom:24px;overflow-x:auto;}
+.tab-btn{background:none;border:none;color:#64748b;font-size:13px;padding:10px 18px;cursor:pointer;font-family:inherit;border-bottom:2px solid transparent;margin-bottom:-1px;white-space:nowrap;transition:all 0.15s;}
 .tab-btn.active{color:#1D9E75;border-bottom-color:#1D9E75;font-weight:500;}
 .panel{display:none;}.panel.active{display:block;}
-.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:20px;}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px;margin-bottom:20px;}
 .stat{background:#1e2130;border:1px solid #2d3348;border-radius:12px;padding:14px 16px;}
 .stat-label{font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:6px;}
-.stat-val{font-size:24px;font-weight:600;color:#fff;}
+.stat-val{font-size:22px;font-weight:600;color:#fff;}
 .stat-sub{font-size:11px;color:#64748b;margin-top:3px;}
 .controls{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;align-items:center;}
 .bankroll-wrap{display:flex;align-items:center;gap:8px;background:#1e2130;border:1px solid #2d3348;border-radius:8px;padding:6px 12px;}
 .bankroll-wrap label{font-size:12px;color:#64748b;}
 .bankroll-wrap input{background:none;border:none;color:#fff;font-size:15px;font-weight:600;width:90px;outline:none;font-family:inherit;}
-.fetch-btn{background:#1D9E75;color:#fff;border:none;border-radius:8px;padding:8px 16px;font-size:13px;cursor:pointer;font-family:inherit;transition:opacity 0.2s;display:flex;align-items:center;gap:6px;}
+.fetch-btn{background:#1D9E75;color:#fff;border:none;border-radius:8px;padding:8px 16px;font-size:13px;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:6px;}
 .fetch-btn:hover{opacity:0.88;}
 .fetch-btn:disabled{opacity:0.5;cursor:not-allowed;}
 .sport-filters{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px;}
@@ -31,20 +31,24 @@ h1{font-size:20px;font-weight:600;color:#fff;margin-bottom:4px;}
 .card{background:#1e2130;border:1px solid #2d3348;border-radius:12px;margin-bottom:10px;overflow:hidden;}
 .card.hot{border-left:3px solid #1D9E75;}
 .card.value-hot{border-left:3px solid #a78bfa;}
+.card.props-hot{border-left:3px solid #f59e0b;}
 .card-header{display:flex;align-items:center;gap:12px;padding:14px 16px;cursor:pointer;}
 .card-icon{font-size:20px;flex-shrink:0;}
 .card-info{flex:1;min-width:0;}
 .card-match{font-size:14px;font-weight:500;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .card-meta{font-size:11px;color:#64748b;margin-top:2px;}
 .card-right{display:flex;align-items:center;gap:10px;flex-shrink:0;}
-.pct-badge{font-size:13px;font-weight:700;padding:4px 10px;border-radius:6px;}
+.pct-badge{font-size:12px;font-weight:700;padding:4px 10px;border-radius:6px;}
 .pct-badge.great{background:rgba(29,158,117,0.2);color:#4ade80;}
 .pct-badge.good{background:rgba(234,179,8,0.15);color:#facc15;}
 .pct-badge.ok{background:rgba(249,115,22,0.15);color:#fb923c;}
 .pct-badge.value-high{background:rgba(167,139,250,0.2);color:#a78bfa;}
 .pct-badge.value-med{background:rgba(96,165,250,0.2);color:#60a5fa;}
+.pct-badge.props-high{background:rgba(245,158,11,0.2);color:#f59e0b;}
+.pct-badge.props-med{background:rgba(251,191,36,0.15);color:#fbbf24;}
 .profit-lbl{font-size:13px;font-weight:600;color:#4ade80;}
 .value-lbl{font-size:13px;font-weight:600;color:#a78bfa;}
+.props-lbl{font-size:13px;font-weight:600;color:#f59e0b;}
 .chev{color:#64748b;font-size:18px;transition:transform 0.2s;display:inline-block;}
 .chev.open{transform:rotate(180deg);}
 .card-body{display:none;padding:0 16px 16px;border-top:1px solid #2d3348;}
@@ -52,17 +56,20 @@ h1{font-size:20px;font-weight:600;color:#fff;margin-bottom:4px;}
 .outcomes-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin:14px 0;}
 .outcome{background:#161926;border:1px solid #2d3348;border-radius:10px;padding:12px;}
 .outcome.highlight{border-color:#a78bfa;}
+.outcome.props-highlight{border-color:#f59e0b;}
 .outcome-name{font-size:11px;color:#64748b;margin-bottom:4px;}
 .outcome-bookie{font-size:12px;color:#94a3b8;font-weight:500;}
 .outcome-odds{font-size:22px;font-weight:700;color:#fff;margin:4px 0;}
 .outcome-stake{font-size:12px;color:#4ade80;font-weight:600;}
 .outcome-return{font-size:11px;color:#64748b;margin-top:2px;}
 .value-tag{font-size:10px;background:rgba(167,139,250,0.2);color:#a78bfa;padding:2px 8px;border-radius:20px;display:inline-block;margin-bottom:6px;}
+.props-tag{font-size:10px;background:rgba(245,158,11,0.2);color:#f59e0b;padding:2px 8px;border-radius:20px;display:inline-block;margin-bottom:6px;}
 .calc-table{width:100%;border-collapse:collapse;margin-top:8px;}
 .calc-table td{padding:6px 0;font-size:13px;border-top:1px solid #2d3348;color:#94a3b8;}
 .calc-table td:last-child{text-align:right;font-weight:500;color:#fff;}
 .calc-table tr.profit td{color:#4ade80;border-top:2px solid #2d3348;font-weight:700;}
 .calc-table tr.value-row td{color:#a78bfa;border-top:2px solid #2d3348;font-weight:700;}
+.calc-table tr.props-row td{color:#f59e0b;border-top:2px solid #2d3348;font-weight:700;}
 .badges{display:flex;gap:6px;flex-wrap:wrap;margin-top:12px;}
 .badge{background:#161926;border:1px solid #2d3348;color:#94a3b8;font-size:11px;padding:3px 9px;border-radius:20px;}
 .empty{text-align:center;padding:3rem;color:#64748b;font-size:14px;line-height:1.8;}
@@ -82,87 +89,170 @@ h1{font-size:20px;font-weight:600;color:#fff;margin-bottom:4px;}
 .edge-bar-wrap{margin:10px 0 6px;}
 .edge-label{font-size:11px;color:#64748b;margin-bottom:4px;}
 .edge-bar{height:6px;background:#2d3348;border-radius:3px;overflow:hidden;}
-.edge-fill{height:100%;border-radius:3px;background:#a78bfa;}
-.pinnacle-note{background:#1a1535;border:1px solid #4c3f7a;border-radius:8px;padding:10px 14px;font-size:12px;color:#a78bfa;margin-bottom:16px;line-height:1.6;}
+.edge-fill-v{height:100%;border-radius:3px;background:#a78bfa;}
+.edge-fill-p{height:100%;border-radius:3px;background:#f59e0b;}
+.note-box{border-radius:8px;padding:10px 14px;font-size:12px;margin-bottom:16px;line-height:1.6;}
+.note-box.purple{background:#1a1535;border:1px solid #4c3f7a;color:#a78bfa;}
+.note-box.amber{background:#1f1600;border:1px solid #7a5a00;color:#f59e0b;}
+.props-market-select{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;}
+.market-btn{background:#1e2130;border:1px solid #2d3348;color:#94a3b8;padding:4px 10px;border-radius:20px;font-size:11px;cursor:pointer;font-family:inherit;}
+.market-btn.active{background:#f59e0b;color:#000;border-color:#f59e0b;font-weight:600;}
+.progress-msg{text-align:center;padding:2rem;color:#64748b;font-size:13px;}
+.progress-bar-wrap{width:60%;margin:12px auto 0;height:4px;background:#2d3348;border-radius:2px;overflow:hidden;}
+.progress-bar-fill{height:100%;background:#1D9E75;border-radius:2px;transition:width 0.3s;}
 </style>
 </head>
 <body>
 
-<h1>⚡ Arb + Value Finder</h1>
-<p class="subtitle">Real-time arbitrage + value bets vs Pinnacle (world's sharpest bookmaker)</p>
+<h1>⚡ Arb + Value + Props</h1>
+<p class="subtitle">Arbitrage · Value vs Pinnacle · +EV Player Props</p>
 
 <div class="api-banner">
   <span class="live-dot"></span>
-  <span id="banner-text">Arb: AU bookmakers · Value: AU soft books vs Pinnacle sharp line</span>
+  <span>AU bookmakers + Pinnacle sharp line · AFL, NRL, NBA player props</span>
   <span class="last-updated" id="last-updated">Not loaded</span>
 </div>
 
 <div class="tabs">
   <button class="tab-btn active" onclick="switchTab('arb',this)">⚡ Arbitrage</button>
-  <button class="tab-btn" onclick="switchTab('value',this)">💎 Value Bets vs Pinnacle</button>
+  <button class="tab-btn" onclick="switchTab('value',this)">💎 Value Bets</button>
+  <button class="tab-btn" onclick="switchTab('props',this)">🎯 Player Props +EV</button>
 </div>
 
 <!-- ARB PANEL -->
 <div class="panel active" id="panel-arb">
   <div class="stats">
-    <div class="stat"><div class="stat-label">Arbs found</div><div class="stat-val" id="a-count">—</div><div class="stat-sub">cross-bookmaker only</div></div>
+    <div class="stat"><div class="stat-label">Arbs found</div><div class="stat-val" id="a-count">—</div><div class="stat-sub">cross-bookmaker</div></div>
     <div class="stat"><div class="stat-label">Best margin</div><div class="stat-val" id="a-best">—</div><div class="stat-sub">guaranteed profit</div></div>
     <div class="stat"><div class="stat-label">Avg margin</div><div class="stat-val" id="a-avg">—</div><div class="stat-sub">across all arbs</div></div>
-    <div class="stat"><div class="stat-label">Best profit</div><div class="stat-val" id="a-profit">—</div><div class="stat-sub">on your bankroll</div></div>
+    <div class="stat"><div class="stat-label">Best profit</div><div class="stat-val" id="a-profit">—</div><div class="stat-sub">on bankroll</div></div>
   </div>
   <div class="controls">
     <div class="bankroll-wrap"><label>Bankroll $</label><input type="number" id="a-bank" value="1000" min="10" step="50" oninput="renderArbs()"/></div>
-    <button class="fetch-btn" id="fetch-btn" onclick="loadAll()">&#8635; Fetch live odds</button>
+    <button class="fetch-btn" id="fetch-btn-a" onclick="loadMatchOdds()">&#8635; Fetch live odds</button>
   </div>
-  <div class="sport-filters" id="a-filters"><button class="sport-btn active" onclick="setArbFilter('all',this)">All sports</button></div>
-  <div id="arb-list"><div class="empty">Click "Fetch live odds" to scan for arbitrage opportunities<br><span style="font-size:12px;color:#475569">Only shows arbs across different bookmakers</span></div></div>
+  <div class="sport-filters" id="a-filters"><button class="sport-btn active" onclick="setFilter('arb','all',this)">All sports</button></div>
+  <div id="arb-list"><div class="empty">Click "Fetch live odds" to scan for arbitrage opportunities</div></div>
 </div>
 
 <!-- VALUE PANEL -->
 <div class="panel" id="panel-value">
-  <div class="pinnacle-note">
-    📌 <strong>How this works:</strong> Pinnacle is the world's sharpest sportsbook — they accept sharp bettors and their odds reflect true probability more accurately than any AU soft book. When a AU bookmaker offers higher odds than Pinnacle, that's a value bet. The bigger the gap, the more value.
-  </div>
+  <div class="note-box purple">📌 <strong>Pinnacle sharp line:</strong> Pinnacle accepts sharp bettors and reflects true probability. When an AU soft book offers higher odds than Pinnacle, that's a value bet — you have a mathematical edge.</div>
   <div class="stats">
     <div class="stat"><div class="stat-label">Value bets</div><div class="stat-val" id="v-count">—</div><div class="stat-sub">vs Pinnacle</div></div>
     <div class="stat"><div class="stat-label">Best edge</div><div class="stat-val" id="v-best">—</div><div class="stat-sub">over Pinnacle</div></div>
     <div class="stat"><div class="stat-label">Avg edge</div><div class="stat-val" id="v-avg">—</div><div class="stat-sub">expected value</div></div>
-    <div class="stat"><div class="stat-label">Top Kelly stake</div><div class="stat-val" id="v-kelly">—</div><div class="stat-sub">recommended bet</div></div>
+    <div class="stat"><div class="stat-label">Top Kelly</div><div class="stat-val" id="v-kelly">—</div><div class="stat-sub">recommended bet</div></div>
   </div>
   <div class="controls">
     <div class="bankroll-wrap"><label>Bankroll $</label><input type="number" id="v-bank" value="1000" min="10" step="50" oninput="renderValue()"/></div>
     <div class="kelly-wrap"><label>Kelly</label><select id="kelly-frac" onchange="renderValue()"><option value="0.25">Quarter Kelly</option><option value="0.5" selected>Half Kelly</option><option value="1">Full Kelly</option></select></div>
     <div class="min-wrap"><label>Min edge %</label><input type="number" id="min-edge" value="2" min="0.5" max="20" step="0.5" oninput="renderValue()"/></div>
-    <button class="fetch-btn" id="fetch-btn-v" onclick="loadAll()">&#8635; Fetch live odds</button>
+    <button class="fetch-btn" id="fetch-btn-v" onclick="loadMatchOdds()">&#8635; Fetch live odds</button>
   </div>
-  <div class="sport-filters" id="v-filters"><button class="sport-btn active" onclick="setValFilter('all',this)">All sports</button></div>
+  <div class="sport-filters" id="v-filters"><button class="sport-btn active" onclick="setFilter('val','all',this)">All sports</button></div>
   <div id="value-list"><div class="empty">Click "Fetch live odds" to find value bets vs Pinnacle</div></div>
 </div>
 
-<script>
-var API_KEY = 'a7d2bf31bedb58714dbefe45fc6c25e5';
-var allArbs = [];
-var allValue = [];
-var arbFilter = 'all';
-var valFilter = 'all';
-var arbSports = {};
-var valSports = {};
+<!-- PROPS PANEL -->
+<div class="panel" id="panel-props">
+  <div class="note-box amber">🎯 <strong>Player props +EV:</strong> Compares AU bookmaker lines (Sportsbet, TAB, Ladbrokes, PointsBet) against Pinnacle's player prop odds. Over/under lines where AU books offer better odds than Pinnacle = positive expected value. Props markets update closer to game time.</div>
+  <div class="stats">
+    <div class="stat"><div class="stat-label">+EV props</div><div class="stat-val" id="p-count">—</div><div class="stat-sub">found</div></div>
+    <div class="stat"><div class="stat-label">Best edge</div><div class="stat-val" id="p-best">—</div><div class="stat-sub">vs Pinnacle</div></div>
+    <div class="stat"><div class="stat-label">Avg edge</div><div class="stat-val" id="p-avg">—</div><div class="stat-sub">across props</div></div>
+    <div class="stat"><div class="stat-label">Top Kelly</div><div class="stat-val" id="p-kelly">—</div><div class="stat-sub">recommended stake</div></div>
+  </div>
+  <div class="controls">
+    <div class="bankroll-wrap"><label>Bankroll $</label><input type="number" id="p-bank" value="1000" min="10" step="50" oninput="renderProps()"/></div>
+    <div class="kelly-wrap"><label>Kelly</label><select id="p-kelly-frac" onchange="renderProps()"><option value="0.25">Quarter Kelly</option><option value="0.5" selected>Half Kelly</option><option value="1">Full Kelly</option></select></div>
+    <div class="min-wrap"><label>Min edge %</label><input type="number" id="p-min-edge" value="2" min="0.5" max="20" step="0.5" oninput="renderProps()"/></div>
+    <button class="fetch-btn" id="fetch-btn-p" onclick="loadProps()">&#8635; Fetch player props</button>
+  </div>
 
-var SPORTS = [
+  <div style="margin-bottom:12px;">
+    <div style="font-size:12px;color:#64748b;margin-bottom:8px;">Sport:</div>
+    <div class="props-market-select" id="props-sport-select">
+      <button class="market-btn active" onclick="setPropsport('aussierules_afl',this)">🏉 AFL</button>
+      <button class="market-btn" onclick="setPropsport('rugbyleague_nrl',this)">🏉 NRL</button>
+      <button class="market-btn" onclick="setPropsport('basketball_nba',this)">🏀 NBA</button>
+      <button class="market-btn" onclick="setPropsport('americanfootball_nfl',this)">🏈 NFL</button>
+    </div>
+  </div>
+
+  <div style="margin-bottom:16px;" id="market-selector-wrap">
+    <div style="font-size:12px;color:#64748b;margin-bottom:8px;">Markets:</div>
+    <div class="props-market-select" id="props-market-select"></div>
+  </div>
+
+  <div class="sport-filters" id="p-filters"><button class="sport-btn active" onclick="setFilter('props','all',this)">All games</button></div>
+  <div id="props-list"><div class="empty">Select a sport and click "Fetch player props"<br><span style="font-size:12px;color:#475569">Props are available closer to game time — try on game day for best results</span></div></div>
+</div>
+
+<script>
+var API_KEY = 'Ya7d2bf31bedb58714dbefe45fc6c25e5';
+var allArbs=[], allValue=[], allProps=[];
+var arbFilter='all', valFilter='all', propsFilter='all';
+var arbSports={}, valSports={}, propsSports={};
+var currentPropsSport='aussierules_afl';
+var selectedMarkets=[];
+
+var MATCH_SPORTS=[
   {key:'aussierules_afl',label:'AFL',icon:'🏉'},
   {key:'rugbyleague_nrl',label:'NRL',icon:'🏉'},
   {key:'soccer_epl',label:'EPL',icon:'⚽'},
   {key:'soccer_a_league',label:'A-League',icon:'⚽'},
   {key:'basketball_nba',label:'NBA',icon:'🏀'},
   {key:'tennis_atp_french_open',label:'Tennis ATP',icon:'🎾'},
-  {key:'tennis_wta_french_open',label:'Tennis WTA',icon:'🎾'},
   {key:'mma_mixed_martial_arts',label:'MMA',icon:'🥊'},
   {key:'americanfootball_nfl',label:'NFL',icon:'🏈'},
   {key:'icehockey_nhl',label:'NHL',icon:'🏒'},
 ];
 
-var AU_BOOKS = 'sportsbet,ladbrokes,tab,bet365,neds,pointsbet,bluebet,unibet,topsport';
-var PINNACLE_KEY = 'pinnacle';
+var AU_BOOKS='sportsbet,ladbrokes,tab,bet365,neds,pointsbet,bluebet,unibet,topsport';
+var AU_PROPS_BOOKS='sportsbet,ladbrokes,tab,pointsbet';
+
+var PROPS_MARKETS={
+  aussierules_afl:{
+    label:'AFL',icon:'🏉',
+    markets:[
+      {key:'player_disposals',label:'Disposals'},
+      {key:'player_goals',label:'Goals'},
+      {key:'player_marks',label:'Marks'},
+      {key:'player_tackles',label:'Tackles'},
+      {key:'player_fantasy_points',label:'Fantasy Points'},
+    ]
+  },
+  rugbyleague_nrl:{
+    label:'NRL',icon:'🏉',
+    markets:[
+      {key:'player_tries',label:'Tries'},
+      {key:'player_points',label:'Points'},
+      {key:'player_runs',label:'Runs'},
+    ]
+  },
+  basketball_nba:{
+    label:'NBA',icon:'🏀',
+    markets:[
+      {key:'player_points',label:'Points'},
+      {key:'player_rebounds',label:'Rebounds'},
+      {key:'player_assists',label:'Assists'},
+      {key:'player_threes',label:'Threes'},
+      {key:'player_blocks',label:'Blocks'},
+      {key:'player_steals',label:'Steals'},
+    ]
+  },
+  americanfootball_nfl:{
+    label:'NFL',icon:'🏈',
+    markets:[
+      {key:'player_pass_yds',label:'Pass Yards'},
+      {key:'player_rush_yds',label:'Rush Yards'},
+      {key:'player_reception_yds',label:'Rec Yards'},
+      {key:'player_receptions',label:'Receptions'},
+      {key:'player_pass_tds',label:'Pass TDs'},
+    ]
+  }
+};
 
 function switchTab(tab,btn){
   document.querySelectorAll('.tab-btn').forEach(function(b){b.classList.remove('active');});
@@ -171,256 +261,294 @@ function switchTab(tab,btn){
   document.getElementById('panel-'+tab).classList.add('active');
 }
 
-async function loadAll(){
-  var btns=document.querySelectorAll('.fetch-btn');
-  btns.forEach(function(b){b.disabled=true;b.innerHTML='<span class="spinning">&#8635;</span> Fetching...';});
-  document.getElementById('arb-list').innerHTML='<div class="empty">Scanning '+SPORTS.length+' sports...</div>';
-  document.getElementById('value-list').innerHTML='<div class="empty">Fetching Pinnacle odds for comparison...</div>';
+function setPropsport(sport,btn){
+  currentPropsSport=sport;
+  selectedMarkets=[];
+  document.querySelectorAll('#props-sport-select .market-btn').forEach(function(b){b.classList.remove('active');});
+  btn.classList.add('active');
+  buildMarketSelector();
+  allProps=[];propsSports={};
+  renderProps();
+}
+
+function buildMarketSelector(){
+  var sp=PROPS_MARKETS[currentPropsSport];
+  if(!sp){document.getElementById('props-market-select').innerHTML='';return;}
+  document.getElementById('props-market-select').innerHTML=sp.markets.map(function(m){
+    var active=selectedMarkets.indexOf(m.key)!==-1;
+    return '<button class="market-btn'+(active?' active':'')+'" onclick="toggleMarket(\''+m.key+'\',this)">'+m.label+'</button>';
+  }).join('');
+  if(selectedMarkets.length===0&&sp.markets.length>0){
+    selectedMarkets=[sp.markets[0].key];
+    document.querySelector('#props-market-select .market-btn').classList.add('active');
+  }
+}
+
+function toggleMarket(key,btn){
+  var idx=selectedMarkets.indexOf(key);
+  if(idx===-1){selectedMarkets.push(key);btn.classList.add('active');}
+  else{selectedMarkets.splice(idx,1);btn.classList.remove('active');}
+}
+
+async function loadMatchOdds(){
+  var btns=[document.getElementById('fetch-btn-a'),document.getElementById('fetch-btn-v')];
+  btns.forEach(function(b){if(b){b.disabled=true;b.innerHTML='<span class="spinning">&#8635;</span> Fetching...';}});
+  document.getElementById('arb-list').innerHTML='<div class="empty">Scanning match markets...</div>';
+  document.getElementById('value-list').innerHTML='<div class="empty">Fetching Pinnacle odds...</div>';
   allArbs=[];allValue=[];arbSports={};valSports={};
 
-  for(var i=0;i<SPORTS.length;i++){
-    var sp=SPORTS[i];
+  for(var i=0;i<MATCH_SPORTS.length;i++){
+    var sp=MATCH_SPORTS[i];
     try{
-      // Fetch AU bookmakers for arb
-      var auUrl='https://api.the-odds-api.com/v4/sports/'+sp.key+'/odds/?apiKey='+API_KEY+'&regions=au&markets=h2h&oddsFormat=decimal&bookmakers='+AU_BOOKS;
-      var auRes=await fetch(auUrl);
-      if(!auRes.ok){
-        if(auRes.status===401){
-          var err='<div class="error-box">⚠ Invalid API key. Check your key from the-odds-api.com</div>';
-          document.getElementById('arb-list').innerHTML=err;
-          document.getElementById('value-list').innerHTML=err;
-          btns.forEach(function(b){b.disabled=false;b.innerHTML='&#8635; Fetch live odds';});
-          return;
-        }
-        continue;
-      }
+      var auRes=await fetch('https://api.the-odds-api.com/v4/sports/'+sp.key+'/odds/?apiKey='+API_KEY+'&regions=au&markets=h2h&oddsFormat=decimal&bookmakers='+AU_BOOKS);
+      if(!auRes.ok){if(auRes.status===401){showError();btns.forEach(function(b){if(b){b.disabled=false;b.innerHTML='&#8635; Fetch live odds';}});return;}continue;}
       var auGames=await auRes.json();
-
-      // Fetch Pinnacle for value betting (EU region)
-      var pinUrl='https://api.the-odds-api.com/v4/sports/'+sp.key+'/odds/?apiKey='+API_KEY+'&regions=eu&markets=h2h&oddsFormat=decimal&bookmakers='+PINNACLE_KEY;
-      var pinRes=await fetch(pinUrl);
+      var pinRes=await fetch('https://api.the-odds-api.com/v4/sports/'+sp.key+'/odds/?apiKey='+API_KEY+'&regions=eu&markets=h2h&oddsFormat=decimal&bookmakers=pinnacle');
       var pinGames=pinRes.ok?await pinRes.json():[];
-
-      // Build Pinnacle odds lookup by event ID
-      var pinOddsMap={};
+      var pinMap={};
       pinGames.forEach(function(g){
         if(!g.bookmakers||!g.bookmakers[0]||!g.bookmakers[0].markets[0])return;
-        var odds={};
-        g.bookmakers[0].markets[0].outcomes.forEach(function(o){odds[o.name]=o.price;});
-        pinOddsMap[g.id]=odds;
+        var o={};g.bookmakers[0].markets[0].outcomes.forEach(function(x){o[x.name]=x.price;});
+        pinMap[g.id]=o;
       });
-
-      // Process each game
       auGames.forEach(function(g){
         var arb=findArb(g,sp);
         if(arb){allArbs.push(arb);arbSports[sp.key]={label:sp.label,icon:sp.icon};}
-        if(pinOddsMap[g.id]){
-          var vals=findValue(g,sp,pinOddsMap[g.id]);
+        if(pinMap[g.id]){
+          var vals=findValue(g,sp,pinMap[g.id]);
           vals.forEach(function(v){allValue.push(v);valSports[sp.key]={label:sp.label,icon:sp.icon};});
         }
       });
     }catch(e){continue;}
   }
-
   allArbs.sort(function(a,b){return b.margin-a.margin;});
   allValue.sort(function(a,b){return b.edge-a.edge;});
-  buildArbFilters();buildValFilters();
+  buildFilters('arb',arbSports,'a-filters',arbFilter,'arb');
+  buildFilters('val',valSports,'v-filters',valFilter,'val');
   renderArbs();renderValue();
   document.getElementById('last-updated').textContent='Updated '+new Date().toLocaleTimeString('en-AU');
-  btns.forEach(function(b){b.disabled=false;b.innerHTML='&#8635; Refresh odds';});
+  btns.forEach(function(b){if(b){b.disabled=false;b.innerHTML='&#8635; Fetch live odds';}});
 }
 
-function findArb(game,sport){
-  if(!game.bookmakers||game.bookmakers.length<2)return null;
-  var names=game.bookmakers[0].markets[0].outcomes.map(function(o){return o.name;});
-  var best={};
-  names.forEach(function(n){best[n]={odds:0,bookie:''};});
-  game.bookmakers.forEach(function(bk){
-    if(!bk.markets||!bk.markets[0])return;
-    bk.markets[0].outcomes.forEach(function(o){
-      if(best[o.name]&&o.price>best[o.name].odds)best[o.name]={odds:o.price,bookie:bk.title};
+async function loadProps(){
+  if(selectedMarkets.length===0){alert('Select at least one market first.');return;}
+  var btn=document.getElementById('fetch-btn-p');
+  btn.disabled=true;btn.innerHTML='<span class="spinning">&#8635;</span> Fetching...';
+  allProps=[];propsSports={};
+  var sp=PROPS_MARKETS[currentPropsSport];
+  var list=document.getElementById('props-list');
+
+  // First get events for this sport
+  try{
+    list.innerHTML='<div class="progress-msg">Getting upcoming games...<div class="progress-bar-wrap"><div class="progress-bar-fill" id="pbar" style="width:10%"></div></div></div>';
+    var evRes=await fetch('https://api.the-odds-api.com/v4/sports/'+currentPropsSport+'/events?apiKey='+API_KEY);
+    if(!evRes.ok){if(evRes.status===401){showError();btn.disabled=false;btn.innerHTML='&#8635; Fetch player props';return;}
+      list.innerHTML='<div class="empty">Could not load events for this sport right now.</div>';btn.disabled=false;btn.innerHTML='&#8635; Fetch player props';return;}
+    var events=await evRes.json();
+    var upcoming=events.filter(function(e){return new Date(e.commence_time)>new Date();}).slice(0,6);
+    if(!upcoming.length){list.innerHTML='<div class="empty">No upcoming games found for this sport right now.</div>';btn.disabled=false;btn.innerHTML='&#8635; Fetch player props';return;}
+
+    var done=0;
+    for(var i=0;i<upcoming.length;i++){
+      var ev=upcoming[i];
+      document.getElementById('pbar').style.width=Math.round(10+((i+1)/upcoming.length)*80)+'%';
+      for(var j=0;j<selectedMarkets.length;j++){
+        var mkt=selectedMarkets[j];
+        try{
+          // AU soft books
+          var auRes=await fetch('https://api.the-odds-api.com/v4/sports/'+currentPropsSport+'/events/'+ev.id+'/odds?apiKey='+API_KEY+'&regions=au&markets='+mkt+'&oddsFormat=decimal&bookmakers='+AU_PROPS_BOOKS);
+          if(!auRes.ok)continue;
+          var auData=await auRes.json();
+          // Pinnacle
+          var pinRes=await fetch('https://api.the-odds-api.com/v4/sports/'+currentPropsSport+'/events/'+ev.id+'/odds?apiKey='+API_KEY+'&regions=eu&markets='+mkt+'&oddsFormat=decimal&bookmakers=pinnacle');
+          var pinData=pinRes.ok?await pinRes.json():null;
+          var pinProps=buildPinPropsMap(pinData);
+          var props=findPropsEV(auData,pinProps,mkt,sp);
+          props.forEach(function(p){allProps.push(p);propsSports[currentPropsSport]={label:sp.label,icon:sp.icon};});
+        }catch(e){continue;}
+      }
+    }
+    allProps.sort(function(a,b){return b.edge-a.edge;});
+    buildFilters('props',propsSports,'p-filters',propsFilter,'props');
+    renderProps();
+    document.getElementById('last-updated').textContent='Updated '+new Date().toLocaleTimeString('en-AU');
+  }catch(e){
+    list.innerHTML='<div class="empty">Error fetching props. Try again.</div>';
+  }
+  btn.disabled=false;btn.innerHTML='&#8635; Fetch player props';
+}
+
+function buildPinPropsMap(data){
+  var map={};
+  if(!data||!data.bookmakers)return map;
+  data.bookmakers.forEach(function(bk){
+    if(!bk.markets)return;
+    bk.markets.forEach(function(mkt){
+      mkt.outcomes.forEach(function(o){
+        var k=o.name+'|'+(o.description||'');
+        if(!map[k]||o.price<map[k])map[k]=o.price;
+      });
     });
   });
-  var implied=0;var valid=true;
-  names.forEach(function(n){if(!best[n]||best[n].odds===0){valid=false;}else{implied+=1/best[n].odds;}});
-  if(!valid||implied>=1)return null;
-  // Reject same-bookie arbs
-  var bkNames=Object.values(best).map(function(b){return b.bookie;});
-  if(bkNames.every(function(b){return b===bkNames[0];}))return null;
-  var margin=Math.round((1-implied)*1000)/10;
-  if(margin<0.1)return null;
-  var t=new Date(game.commence_time);
-  var timeStr=t.toLocaleDateString('en-AU',{weekday:'short',month:'short',day:'numeric'})+' '+t.toLocaleTimeString('en-AU',{hour:'2-digit',minute:'2-digit'});
-  return{sport:sport.key,label:sport.label,icon:sport.icon,match:game.home_team+' vs '+game.away_team,time:timeStr,margin:margin,implied:implied,outcomes:names.map(function(n){return{name:n,odds:best[n].odds,bookie:best[n].bookie};})};
+  return map;
 }
 
-function findValue(game,sport,pinOdds){
-  if(!game.bookmakers||!pinOdds)return[];
+function findPropsEV(data,pinMap,marketKey,sport){
   var results=[];
-  game.bookmakers.forEach(function(bk){
-    if(!bk.markets||!bk.markets[0])return;
-    bk.markets[0].outcomes.forEach(function(o){
-      var pinPrice=pinOdds[o.name];
-      if(!pinPrice||pinPrice===0)return;
-      if(o.price<=pinPrice)return;
-      var edge=Math.round((o.price/pinPrice-1)*1000)/10;
-      if(edge<0.5)return;
-      var pinImplied=1/pinPrice;
-      var t=new Date(game.commence_time);
-      var timeStr=t.toLocaleDateString('en-AU',{weekday:'short',month:'short',day:'numeric'})+' '+t.toLocaleTimeString('en-AU',{hour:'2-digit',minute:'2-digit'});
-      results.push({
-        sport:sport.key,label:sport.label,icon:sport.icon,
-        match:game.home_team+' vs '+game.away_team,
-        time:timeStr,outcome:o.name,
-        softOdds:o.price,softBookie:bk.title,
-        pinOdds:pinPrice,pinImplied:pinImplied,
-        edge:edge
+  if(!data||!data.bookmakers)return results;
+  var marketLabel=selectedMarkets.reduce(function(s,k){
+    var m=(PROPS_MARKETS[currentPropsSport]||{markets:[]}).markets.find(function(x){return x.key===k;});
+    return k===marketKey&&m?m.label:s;
+  },'Props');
+
+  data.bookmakers.forEach(function(bk){
+    if(!bk.markets)return;
+    bk.markets.forEach(function(mkt){
+      mkt.outcomes.forEach(function(o){
+        var pinKey=o.name+'|'+(o.description||'');
+        var pinOdd=pinMap[pinKey];
+        if(!pinOdd||pinOdd===0)return;
+        if(o.price<=pinOdd)return;
+        var edge=Math.round((o.price/pinOdd-1)*1000)/10;
+        if(edge<0.5)return;
+        var t=new Date(data.commence_time||'');
+        var timeStr=isNaN(t)?'TBC':t.toLocaleDateString('en-AU',{weekday:'short',month:'short',day:'numeric'})+' '+t.toLocaleTimeString('en-AU',{hour:'2-digit',minute:'2-digit'});
+        results.push({
+          sport:currentPropsSport,
+          label:sport.label,icon:sport.icon,
+          match:(data.home_team||'')+(data.away_team?' vs '+data.away_team:''),
+          time:timeStr,
+          player:o.description||o.name,
+          betType:o.name,
+          market:marketLabel,
+          softOdds:o.price,
+          softBookie:bk.title,
+          pinOdds:pinOdd,
+          pinImplied:1/pinOdd,
+          edge:edge
+        });
       });
     });
   });
   return results;
 }
 
-function buildArbFilters(){
-  var html='<button class="sport-btn'+(arbFilter==='all'?' active':'')+'" onclick="setArbFilter(\'all\',this)">All sports</button>';
-  Object.keys(arbSports).forEach(function(k){var s=arbSports[k];html+='<button class="sport-btn'+(arbFilter===k?' active':'')+'" onclick="setArbFilter(\''+k+'\',this)">'+s.icon+' '+s.label+'</button>';});
-  document.getElementById('a-filters').innerHTML=html;
+function findArb(game,sport){
+  if(!game.bookmakers||game.bookmakers.length<2)return null;
+  var names=game.bookmakers[0].markets[0].outcomes.map(function(o){return o.name;});
+  var best={};names.forEach(function(n){best[n]={odds:0,bookie:''};});
+  game.bookmakers.forEach(function(bk){
+    if(!bk.markets||!bk.markets[0])return;
+    bk.markets[0].outcomes.forEach(function(o){if(best[o.name]&&o.price>best[o.name].odds)best[o.name]={odds:o.price,bookie:bk.title};});
+  });
+  var implied=0;var valid=true;
+  names.forEach(function(n){if(!best[n]||best[n].odds===0){valid=false;}else{implied+=1/best[n].odds;}});
+  if(!valid||implied>=1)return null;
+  var bkNames=Object.values(best).map(function(b){return b.bookie;});
+  if(bkNames.every(function(b){return b===bkNames[0];}))return null;
+  var margin=Math.round((1-implied)*1000)/10;
+  if(margin<0.1)return null;
+  var t=new Date(game.commence_time);
+  var ts=t.toLocaleDateString('en-AU',{weekday:'short',month:'short',day:'numeric'})+' '+t.toLocaleTimeString('en-AU',{hour:'2-digit',minute:'2-digit'});
+  return{sport:sport.key,label:sport.label,icon:sport.icon,match:game.home_team+' vs '+game.away_team,time:ts,margin:margin,implied:implied,outcomes:names.map(function(n){return{name:n,odds:best[n].odds,bookie:best[n].bookie};})};
 }
-function buildValFilters(){
-  var html='<button class="sport-btn'+(valFilter==='all'?' active':'')+'" onclick="setValFilter(\'all\',this)">All sports</button>';
-  Object.keys(valSports).forEach(function(k){var s=valSports[k];html+='<button class="sport-btn'+(valFilter===k?' active':'')+'" onclick="setValFilter(\''+k+'\',this)">'+s.icon+' '+s.label+'</button>';});
-  document.getElementById('v-filters').innerHTML=html;
+
+function findValue(game,sport,pinOdds){
+  var results=[];
+  if(!game.bookmakers||!pinOdds)return results;
+  game.bookmakers.forEach(function(bk){
+    if(!bk.markets||!bk.markets[0])return;
+    bk.markets[0].outcomes.forEach(function(o){
+      var pp=pinOdds[o.name];if(!pp||pp===0||o.price<=pp)return;
+      var edge=Math.round((o.price/pp-1)*1000)/10;if(edge<0.5)return;
+      var t=new Date(game.commence_time);
+      var ts=t.toLocaleDateString('en-AU',{weekday:'short',month:'short',day:'numeric'})+' '+t.toLocaleTimeString('en-AU',{hour:'2-digit',minute:'2-digit'});
+      results.push({sport:sport.key,label:sport.label,icon:sport.icon,match:game.home_team+' vs '+game.away_team,time:ts,outcome:o.name,softOdds:o.price,softBookie:bk.title,pinOdds:pp,pinImplied:1/pp,edge:edge});
+    });
+  });
+  return results;
 }
-function setArbFilter(f,btn){arbFilter=f;document.querySelectorAll('#a-filters .sport-btn').forEach(function(b){b.classList.remove('active');});btn.classList.add('active');renderArbs();}
-function setValFilter(f,btn){valFilter=f;document.querySelectorAll('#v-filters .sport-btn').forEach(function(b){b.classList.remove('active');});btn.classList.add('active');renderValue();}
+
+function buildFilters(type,sportsMap,elId,current,filterType){
+  var html='<button class="sport-btn'+(current==='all'?' active':'')+'" onclick="setFilter(\''+filterType+'\',\'all\',this)">All</button>';
+  Object.keys(sportsMap).forEach(function(k){var s=sportsMap[k];html+='<button class="sport-btn'+(current===k?' active':'')+'" onclick="setFilter(\''+filterType+'\',\''+k+'\',this)">'+s.icon+' '+s.label+'</button>';});
+  document.getElementById(elId).innerHTML=html;
+}
+
+function setFilter(type,f,btn){
+  if(type==='arb'){arbFilter=f;document.querySelectorAll('#a-filters .sport-btn').forEach(function(b){b.classList.remove('active');});btn.classList.add('active');renderArbs();}
+  else if(type==='val'){valFilter=f;document.querySelectorAll('#v-filters .sport-btn').forEach(function(b){b.classList.remove('active');});btn.classList.add('active');renderValue();}
+  else{propsFilter=f;document.querySelectorAll('#p-filters .sport-btn').forEach(function(b){b.classList.remove('active');});btn.classList.add('active');renderProps();}
+}
 
 function renderArbs(){
   var bank=parseFloat(document.getElementById('a-bank').value)||1000;
   var list=allArbs.filter(function(a){return arbFilter==='all'||a.sport===arbFilter;});
   document.getElementById('a-count').textContent=list.length||'0';
-  if(list.length){
-    document.getElementById('a-best').textContent=list[0].margin.toFixed(1)+'%';
-    var avg=list.reduce(function(s,a){return s+a.margin;},0)/list.length;
-    document.getElementById('a-avg').textContent=avg.toFixed(1)+'%';
-    document.getElementById('a-profit').textContent='$'+Math.round(bank*(list[0].margin/100)*100)/100;
-  }else{
-    document.getElementById('a-best').textContent='—';
-    document.getElementById('a-avg').textContent='—';
-    document.getElementById('a-profit').textContent='—';
-  }
-  if(!list.length){document.getElementById('arb-list').innerHTML='<div class="empty">No cross-bookmaker arbs right now.<br><span style="font-size:12px;color:#475569">Refresh again — arbs appear and disappear quickly</span></div>';return;}
+  if(list.length){document.getElementById('a-best').textContent=list[0].margin.toFixed(1)+'%';var avg=list.reduce(function(s,a){return s+a.margin;},0)/list.length;document.getElementById('a-avg').textContent=avg.toFixed(1)+'%';document.getElementById('a-profit').textContent='$'+Math.round(bank*(list[0].margin/100)*100)/100;}
+  else{document.getElementById('a-best').textContent='—';document.getElementById('a-avg').textContent='—';document.getElementById('a-profit').textContent='—';}
+  if(!list.length){document.getElementById('arb-list').innerHTML='<div class="empty">No cross-bookmaker arbs right now. Refresh again.</div>';return;}
   document.getElementById('arb-list').innerHTML=list.map(function(a,i){
     var stakes=a.outcomes.map(function(o){return Math.round((bank/o.odds/a.implied)*100)/100;});
     var returns=a.outcomes.map(function(o,j){return Math.round(stakes[j]*o.odds*100)/100;});
     var profit=Math.round(bank*(a.margin/100)*100)/100;
     var cls=a.margin>=3?'great':a.margin>=1.5?'good':'ok';
-    var outHtml=a.outcomes.map(function(o,j){
-      return '<div class="outcome"><div class="outcome-name">'+o.name+'</div><div class="outcome-bookie">'+o.bookie+'</div><div class="outcome-odds">'+o.odds.toFixed(2)+'</div><div class="outcome-stake">Stake $'+stakes[j].toFixed(2)+'</div><div class="outcome-return">Returns $'+returns[j].toFixed(2)+'</div></div>';
-    }).join('');
+    var outHtml=a.outcomes.map(function(o,j){return '<div class="outcome"><div class="outcome-name">'+o.name+'</div><div class="outcome-bookie">'+o.bookie+'</div><div class="outcome-odds">'+o.odds.toFixed(2)+'</div><div class="outcome-stake">Stake $'+stakes[j].toFixed(2)+'</div><div class="outcome-return">Returns $'+returns[j].toFixed(2)+'</div></div>';}).join('');
     var bookies=[...new Set(a.outcomes.map(function(o){return o.bookie;}))];
-    return '<div class="card'+(a.margin>=2?' hot':'')+'">'+
-      '<div class="card-header" onclick="tog(\'a\','+i+')">'+
-        '<div class="card-icon">'+a.icon+'</div>'+
-        '<div class="card-info"><div class="card-match">'+a.match+'</div><div class="card-meta">'+a.label+' · '+a.time+'</div></div>'+
-        '<div class="card-right"><div class="pct-badge '+cls+'">+'+a.margin.toFixed(1)+'%</div><div class="profit-lbl">+$'+profit.toFixed(2)+'</div><span class="chev" id="ach'+i+'">&#8964;</span></div>'+
-      '</div>'+
-      '<div class="card-body" id="abd'+i+'">'+
-        '<div class="outcomes-grid">'+outHtml+'</div>'+
-        '<table class="calc-table">'+
-          '<tr><td>Total staked</td><td>$'+bank.toFixed(2)+'</td></tr>'+
-          '<tr><td>Guaranteed return</td><td>$'+(bank+profit).toFixed(2)+'</td></tr>'+
-          '<tr class="profit"><td>Guaranteed profit</td><td>+$'+profit.toFixed(2)+' (+'+a.margin.toFixed(1)+'%)</td></tr>'+
-        '</table>'+
-        '<div class="badges">'+bookies.map(function(b){return '<span class="badge">'+b+'</span>';}).join('')+'</div>'+
-      '</div>'+
-    '</div>';
+    return card('a',i,a.icon,a.match,a.label+' · '+a.time,'<div class="pct-badge '+cls+'">+'+a.margin.toFixed(1)+'%</div><div class="profit-lbl">+$'+profit.toFixed(2)+'</div>',a.margin>=2?'hot':'','<div class="outcomes-grid">'+outHtml+'</div><table class="calc-table"><tr><td>Total staked</td><td>$'+bank.toFixed(2)+'</td></tr><tr><td>Guaranteed return</td><td>$'+(bank+profit).toFixed(2)+'</td></tr><tr class="profit"><td>Guaranteed profit</td><td>+$'+profit.toFixed(2)+' (+'+a.margin.toFixed(1)+'%)</td></tr></table><div class="badges">'+bookies.map(function(b){return '<span class="badge">'+b+'</span>';}).join('')+'</div>');
   }).join('');
 }
 
 function renderValue(){
   var bank=parseFloat(document.getElementById('v-bank').value)||1000;
-  var kellyFrac=parseFloat(document.getElementById('kelly-frac').value)||0.5;
-  var minEdge=parseFloat(document.getElementById('min-edge').value)||2;
-  var list=allValue.filter(function(v){return(valFilter==='all'||v.sport===valFilter)&&v.edge>=minEdge;});
+  var kf=parseFloat(document.getElementById('kelly-frac').value)||0.5;
+  var me=parseFloat(document.getElementById('min-edge').value)||2;
+  var list=allValue.filter(function(v){return(valFilter==='all'||v.sport===valFilter)&&v.edge>=me;});
   document.getElementById('v-count').textContent=list.length||'0';
-  if(list.length){
-    document.getElementById('v-best').textContent=list[0].edge.toFixed(1)+'%';
-    var avg=list.reduce(function(s,v){return s+v.edge;},0)/list.length;
-    document.getElementById('v-avg').textContent=avg.toFixed(1)+'%';
-    var topKelly=calcKelly(list[0],bank,kellyFrac);
-    document.getElementById('v-kelly').textContent='$'+topKelly.toFixed(2);
-  }else{
-    document.getElementById('v-best').textContent='—';
-    document.getElementById('v-avg').textContent='—';
-    document.getElementById('v-kelly').textContent='—';
-  }
-  if(!list.length){
-    document.getElementById('value-list').innerHTML='<div class="empty">No value bets above '+minEdge+'% edge right now.<br><span style="font-size:12px;color:#475569">Try lowering min edge % or refreshing — value appears when AU books are slow to adjust odds</span></div>';
-    return;
-  }
+  if(list.length){document.getElementById('v-best').textContent=list[0].edge.toFixed(1)+'%';var avg=list.reduce(function(s,v){return s+v.edge;},0)/list.length;document.getElementById('v-avg').textContent=avg.toFixed(1)+'%';document.getElementById('v-kelly').textContent='$'+kelly(list[0],bank,kf).toFixed(2);}
+  else{document.getElementById('v-best').textContent='—';document.getElementById('v-avg').textContent='—';document.getElementById('v-kelly').textContent='—';}
+  if(!list.length){document.getElementById('value-list').innerHTML='<div class="empty">No value bets above '+me+'% edge right now.<br><span style="font-size:12px;color:#475569">Lower the min edge % or refresh</span></div>';return;}
   document.getElementById('value-list').innerHTML=list.map(function(v,i){
-    var kelly=calcKelly(v,bank,kellyFrac);
-    var potReturn=Math.round(kelly*v.softOdds*100)/100;
-    var potProfit=Math.round((potReturn-kelly)*100)/100;
-    var edgeCls=v.edge>=8?'value-high':'value-med';
-    var barPct=Math.min(100,Math.round(v.edge*5));
-    return '<div class="card'+(v.edge>=5?' value-hot':'')+'">'+
-      '<div class="card-header" onclick="tog(\'v\','+i+')">'+
-        '<div class="card-icon">'+v.icon+'</div>'+
-        '<div class="card-info">'+
-          '<div class="card-match">'+v.match+'</div>'+
-          '<div class="card-meta">'+v.label+' · '+v.time+' · Bet: <strong style="color:#e2e8f0">'+v.outcome+'</strong> @ '+v.softBookie+'</div>'+
-        '</div>'+
-        '<div class="card-right">'+
-          '<div class="pct-badge '+edgeCls+'">+'+v.edge.toFixed(1)+'% edge</div>'+
-          '<div class="value-lbl">$'+kelly.toFixed(2)+'</div>'+
-          '<span class="chev" id="vch'+i+'">&#8964;</span>'+
-        '</div>'+
-      '</div>'+
-      '<div class="card-body" id="vbd'+i+'">'+
-        '<div class="edge-bar-wrap"><div class="edge-label">Edge vs Pinnacle</div><div class="edge-bar"><div class="edge-fill" style="width:'+barPct+'%"></div></div></div>'+
-        '<div class="outcomes-grid">'+
-          '<div class="outcome highlight">'+
-            '<div class="value-tag">VALUE BET</div>'+
-            '<div class="outcome-name">'+v.outcome+'</div>'+
-            '<div class="outcome-bookie">'+v.softBookie+'</div>'+
-            '<div class="outcome-odds">'+v.softOdds.toFixed(2)+'</div>'+
-            '<div class="outcome-stake">Kelly stake: $'+kelly.toFixed(2)+'</div>'+
-            '<div class="outcome-return">Returns $'+potReturn.toFixed(2)+' if wins</div>'+
-          '</div>'+
-          '<div class="outcome">'+
-            '<div class="outcome-name">Pinnacle (sharp line)</div>'+
-            '<div class="outcome-bookie">True probability</div>'+
-            '<div class="outcome-odds">'+v.pinOdds.toFixed(2)+'</div>'+
-            '<div class="outcome-stake" style="color:#64748b">'+(Math.round(v.pinImplied*1000)/10)+'% implied</div>'+
-          '</div>'+
-        '</div>'+
-        '<table class="calc-table">'+
-          '<tr><td>Kelly stake ('+Math.round(kellyFrac*100)+'% Kelly)</td><td>$'+kelly.toFixed(2)+'</td></tr>'+
-          '<tr><td>If bet wins</td><td style="color:#4ade80">+$'+potProfit.toFixed(2)+'</td></tr>'+
-          '<tr><td>If bet loses</td><td style="color:#fb923c">-$'+kelly.toFixed(2)+'</td></tr>'+
-          '<tr class="value-row"><td>Edge over Pinnacle</td><td>+'+v.edge.toFixed(1)+'%</td></tr>'+
-        '</table>'+
-        '<div class="badges"><span class="badge">'+v.softBookie+'</span><span class="badge">Pinnacle: '+v.pinOdds.toFixed(2)+'</span></div>'+
-      '</div>'+
-    '</div>';
+    var k=kelly(v,bank,kf);var ret=Math.round(k*v.softOdds*100)/100;var prof=Math.round((ret-k)*100)/100;
+    var cls=v.edge>=8?'value-high':'value-med';var bar=Math.min(100,Math.round(v.edge*5));
+    return card('v',i,v.icon,v.match,v.label+' · '+v.time+' · Bet: <strong style="color:#e2e8f0">'+v.outcome+'</strong> @ '+v.softBookie,'<div class="pct-badge '+cls+'">+'+v.edge.toFixed(1)+'%</div><div class="value-lbl">$'+k.toFixed(2)+'</div>',v.edge>=5?'value-hot':'','<div class="edge-bar-wrap"><div class="edge-label">Edge vs Pinnacle</div><div class="edge-bar"><div class="edge-fill-v" style="width:'+bar+'%"></div></div></div><div class="outcomes-grid"><div class="outcome highlight"><div class="value-tag">VALUE BET</div><div class="outcome-name">'+v.outcome+'</div><div class="outcome-bookie">'+v.softBookie+'</div><div class="outcome-odds">'+v.softOdds.toFixed(2)+'</div><div class="outcome-stake">Kelly: $'+k.toFixed(2)+'</div><div class="outcome-return">Returns $'+ret.toFixed(2)+'</div></div><div class="outcome"><div class="outcome-name">Pinnacle (sharp)</div><div class="outcome-bookie">True probability</div><div class="outcome-odds">'+v.pinOdds.toFixed(2)+'</div><div class="outcome-stake" style="color:#64748b">'+(Math.round(v.pinImplied*1000)/10)+'% implied</div></div></div><table class="calc-table"><tr><td>Kelly stake</td><td>$'+k.toFixed(2)+'</td></tr><tr><td>If wins</td><td style="color:#4ade80">+$'+prof.toFixed(2)+'</td></tr><tr><td>If loses</td><td style="color:#fb923c">-$'+k.toFixed(2)+'</td></tr><tr class="value-row"><td>Edge over Pinnacle</td><td>+'+v.edge.toFixed(1)+'%</td></tr></table><div class="badges"><span class="badge">'+v.softBookie+'</span><span class="badge">Pinnacle: '+v.pinOdds.toFixed(2)+'</span></div>');
   }).join('');
 }
 
-function calcKelly(v,bank,frac){
-  var b=v.softOdds-1;
-  var p=v.pinImplied;
-  var q=1-p;
-  var kelly=((b*p-q)/b)*frac;
-  if(kelly<=0)return 0;
-  return Math.round(Math.min(bank*kelly,bank*0.2)*100)/100;
+function renderProps(){
+  var bank=parseFloat(document.getElementById('p-bank').value)||1000;
+  var kf=parseFloat(document.getElementById('p-kelly-frac').value)||0.5;
+  var me=parseFloat(document.getElementById('p-min-edge').value)||2;
+  var list=allProps.filter(function(p){return(propsFilter==='all'||p.sport===propsFilter)&&p.edge>=me;});
+  document.getElementById('p-count').textContent=list.length||'0';
+  if(list.length){document.getElementById('p-best').textContent=list[0].edge.toFixed(1)+'%';var avg=list.reduce(function(s,p){return s+p.edge;},0)/list.length;document.getElementById('p-avg').textContent=avg.toFixed(1)+'%';document.getElementById('p-kelly').textContent='$'+kellyProps(list[0],bank,kf).toFixed(2);}
+  else{document.getElementById('p-best').textContent='—';document.getElementById('p-avg').textContent='—';document.getElementById('p-kelly').textContent='—';}
+  if(!list.length){document.getElementById('props-list').innerHTML='<div class="empty">No +EV props above '+me+'% right now.<br><span style="font-size:12px;color:#475569">Props appear closer to game time. Try lowering min edge or checking on game day.</span></div>';return;}
+  document.getElementById('props-list').innerHTML=list.map(function(p,i){
+    var k=kellyProps(p,bank,kf);var ret=Math.round(k*p.softOdds*100)/100;var prof=Math.round((ret-k)*100)/100;
+    var cls=p.edge>=8?'props-high':'props-med';var bar=Math.min(100,Math.round(p.edge*5));
+    return card('p',i,p.icon,p.player+' — '+p.market+' ('+p.betType+')',p.match+' · '+p.time+' · '+p.softBookie,'<div class="pct-badge '+cls+'">+'+p.edge.toFixed(1)+'% EV</div><div class="props-lbl">$'+k.toFixed(2)+'</div>',p.edge>=5?'props-hot':'','<div class="edge-bar-wrap"><div class="edge-label">Edge vs Pinnacle</div><div class="edge-bar"><div class="edge-fill-p" style="width:'+bar+'%"></div></div></div><div class="outcomes-grid"><div class="outcome props-highlight"><div class="props-tag">+EV PROP</div><div class="outcome-name">'+p.betType+' — '+p.market+'</div><div class="outcome-bookie">'+p.softBookie+'</div><div class="outcome-odds">'+p.softOdds.toFixed(2)+'</div><div class="outcome-stake">Kelly: $'+k.toFixed(2)+'</div><div class="outcome-return">Returns $'+ret.toFixed(2)+'</div></div><div class="outcome"><div class="outcome-name">Pinnacle (sharp line)</div><div class="outcome-bookie">True probability</div><div class="outcome-odds">'+p.pinOdds.toFixed(2)+'</div><div class="outcome-stake" style="color:#64748b">'+(Math.round(p.pinImplied*1000)/10)+'% implied</div></div></div><table class="calc-table"><tr><td>Kelly stake</td><td>$'+k.toFixed(2)+'</td></tr><tr><td>If wins</td><td style="color:#4ade80">+$'+prof.toFixed(2)+'</td></tr><tr><td>If loses</td><td style="color:#fb923c">-$'+k.toFixed(2)+'</td></tr><tr class="props-row"><td>Edge over Pinnacle</td><td>+'+p.edge.toFixed(1)+'%</td></tr></table><div class="badges"><span class="badge">'+p.softBookie+'</span><span class="badge">Match: '+esc(p.match)+'</span></div>');
+  }).join('');
 }
 
-function tog(prefix,i){
-  var b=document.getElementById(prefix+'bd'+i),c=document.getElementById(prefix+'ch'+i);
-  var o=b.classList.contains('open');
-  b.classList.toggle('open',!o);c.classList.toggle('open',!o);
+function card(prefix,i,icon,title,meta,rightHtml,hotClass,bodyHtml){
+  return '<div class="card'+(hotClass?' '+hotClass:'')+'">'+
+    '<div class="card-header" onclick="tog(\''+prefix+'\','+i+')">'+
+      '<div class="card-icon">'+icon+'</div>'+
+      '<div class="card-info"><div class="card-match">'+title+'</div><div class="card-meta">'+meta+'</div></div>'+
+      '<div class="card-right">'+rightHtml+'<span class="chev" id="'+prefix+'ch'+i+'">&#8964;</span></div>'+
+    '</div>'+
+    '<div class="card-body" id="'+prefix+'bd'+i+'">'+bodyHtml+'</div>'+
+  '</div>';
 }
+
+function kelly(v,bank,frac){var b=v.softOdds-1;var p=v.pinImplied;var q=1-p;var k=((b*p-q)/b)*frac;if(k<=0)return 0;return Math.round(Math.min(bank*k,bank*0.2)*100)/100;}
+function kellyProps(p,bank,frac){return kelly({softOdds:p.softOdds,pinImplied:p.pinImplied},bank,frac);}
+function tog(prefix,i){var b=document.getElementById(prefix+'bd'+i),c=document.getElementById(prefix+'ch'+i),o=b.classList.contains('open');b.classList.toggle('open',!o);c.classList.toggle('open',!o);}
+function esc(str){var d=document.createElement('div');d.textContent=str;return d.innerHTML;}
+function showError(){var e='<div class="error-box">⚠ Invalid API key</div>';document.getElementById('arb-list').innerHTML=e;document.getElementById('value-list').innerHTML=e;document.getElementById('props-list').innerHTML=e;}
+
+buildMarketSelector();
 </script>
 </body>
 </html>
